@@ -110,16 +110,16 @@ display_usage() {
 interactive_menu() {
     echo -e "\n"
     echo "Select diagnostics to run:"
-    echo "1) System Information"
-    echo "2) PCI Devices Configuration"
-    echo "3) USB Devices Configuration"
-    echo "4) Kernel Loaded Modules"
-    echo "5) Output Configuration Files"
-    echo "6) Ping Tests"
-    echo "7) List Network Interfaces"
-    echo "8) Check Wi-Fi Connection Status"
-    echo "9) DNS Resolution Test"
-    echo "10) Gateway Reachability Test"
+    echo "1) List Network Interfaces"
+    echo "2) Check Wi-Fi Connection Status"
+    echo "3) Ping Tests"
+    echo "4) DNS Resolution Test"
+    echo "5) Gateway Reachability Test"
+    echo "6) Output Configuration Files"
+    echo "7) Kernel Loaded Modules"
+    echo "8) USB Devices Configuration"
+    echo "9) PCI Devices Configuration"
+    echo "10) System Information"
     echo "11) All of the above"
     echo "12) Exit"
     echo -n "Enter your choice [1-12]: "
@@ -163,54 +163,19 @@ chmod +x "$0"
 
 # Function to run all diagnostics
 run_all_diagnostics() {
-    system_information
-    pci_devices_configuration
-    usb_devices_configuration
-    kernel_loaded_modules
-    output_configuration_files
-    ping_tests
     list_network_interfaces
     check_wifi_status
+    ping_tests
     dns_resolution_test
     gateway_reachability_test
+    output_configuration_files
+    kernel_loaded_modules
+    usb_devices_configuration
+    pci_devices_configuration
+    system_information
 }
 
 # Functions for diagnostics
-system_information() {
-    section_header "Operating System Information"
-    run_and_log "uname -a"
-}
-
-pci_devices_configuration() {
-    section_header "PCI Devices Configuration List (verbose)"
-    run_and_log "pciconf -lv"
-}
-
-usb_devices_configuration() {
-    section_header "USB Devices Configuration List"
-    run_and_log "usbconfig list"
-    run_and_log "usbconfig dump_device_desc"
-}
-
-kernel_loaded_modules() {
-    section_header "Kernel Loaded Modules"
-    run_and_log "kldstat"
-}
-
-output_configuration_files() {
-    output_file_contents "$LOADER_CONF"
-    output_file_contents "$RC_CONF"
-    output_file_contents "$WPA_SUPPLICANT_CONF"
-}
-
-ping_tests() {
-    section_header "Ping Tests"
-    run_and_log "ping -c 3 8.8.8.8"
-    run_and_log "ping -c 3 208.67.222.222"
-    run_and_log "ping -c 3 he.net"
-    run_and_log "ping -c 3 63.231.92.27"
-}
-
 list_network_interfaces() {
     section_header "Available Network Interfaces"
     run_and_log "ifconfig -a"
@@ -220,6 +185,14 @@ check_wifi_status() {
     section_header "Wi-Fi Connection Status"
     run_and_log "ifconfig wlan0"
     run_and_log "wpa_cli status"
+}
+
+ping_tests() {
+    section_header "Ping Tests"
+    run_and_log "ping -c 3 8.8.8.8"
+    run_and_log "ping -c 3 208.67.222.222"
+    run_and_log "ping -c 3 he.net"
+    run_and_log "ping -c 3 63.231.92.27"
 }
 
 dns_resolution_test() {
@@ -237,6 +210,33 @@ gateway_reachability_test() {
     fi
 }
 
+output_configuration_files() {
+    output_file_contents "$LOADER_CONF"
+    output_file_contents "$RC_CONF"
+    output_file_contents "$WPA_SUPPLICANT_CONF"
+}
+
+kernel_loaded_modules() {
+    section_header "Kernel Loaded Modules"
+    run_and_log "kldstat"
+}
+
+usb_devices_configuration() {
+    section_header "USB Devices Configuration List"
+    run_and_log "usbconfig list"
+    run_and_log "usbconfig dump_device_desc"
+}
+
+pci_devices_configuration() {
+    section_header "PCI Devices Configuration List (verbose)"
+    run_and_log "pciconf -lv"
+}
+
+system_information() {
+    section_header "Operating System Information"
+    run_and_log "uname -a"
+}
+
 # Interactive mode
 if [ "$INTERACTIVE" -eq 1 ]; then
     while true; do
@@ -244,34 +244,34 @@ if [ "$INTERACTIVE" -eq 1 ]; then
         choice=$?
         case "$choice" in
             1)
-                system_information
-                ;;
-            2)
-                pci_devices_configuration
-                ;;
-            3)
-                usb_devices_configuration
-                ;;
-            4)
-                kernel_loaded_modules
-                ;;
-            5)
-                output_configuration_files
-                ;;
-            6)
-                ping_tests
-                ;;
-            7)
                 list_network_interfaces
                 ;;
-            8)
+            2)
                 check_wifi_status
                 ;;
-            9)
+            3)
+                ping_tests
+                ;;
+            4)
                 dns_resolution_test
                 ;;
-            10)
+            5)
                 gateway_reachability_test
+                ;;
+            6)
+                output_configuration_files
+                ;;
+            7)
+                kernel_loaded_modules
+                ;;
+            8)
+                usb_devices_configuration
+                ;;
+            9)
+                pci_devices_configuration
+                ;;
+            10)
+                system_information
                 ;;
             11)
                 run_all_diagnostics
@@ -292,6 +292,4 @@ fi
 # Additional help
 section_header "Additional Help"
 cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-For more help, visit the GhostBSD Telegram group: https://t.me/GhostBSD or IRC chat group.
-Post a copy of these outputs to pastebin.com and share the URL link for review.
-EOF
+For more help, visit the GhostBSD Telegram group: https://
