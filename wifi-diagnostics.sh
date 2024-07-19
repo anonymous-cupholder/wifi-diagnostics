@@ -118,9 +118,11 @@ interactive_menu() {
     echo "6) Ping Tests"
     echo "7) List Network Interfaces"
     echo "8) Check Wi-Fi Connection Status"
-    echo "9) All of the above"
-    echo "10) Exit"
-    echo -n "Enter your choice [1-10]: "
+    echo "9) DNS Resolution Test"
+    echo "10) Gateway Reachability Test"
+    echo "11) All of the above"
+    echo "12) Exit"
+    echo -n "Enter your choice [1-12]: "
     read -r choice
     return $choice
 }
@@ -144,7 +146,7 @@ while getopts "vi" opt; do
 done
 
 # Ensure required commands are available
-required_commands="uname pciconf usbconfig kldstat cat ifconfig ping service killall netstat sockstat wpa_supplicant"
+required_commands="uname pciconf usbconfig kldstat cat ifconfig ping service killall netstat sockstat wpa_supplicant drill"
 for cmd in $required_commands; do
     check_command "$cmd"
 done
@@ -159,9 +161,6 @@ check_root
 # Set execute privilege for the script
 chmod +x "$0"
 
-# Display usage information
-display_usage
-
 # Function to run all diagnostics
 run_all_diagnostics() {
     system_information
@@ -172,6 +171,8 @@ run_all_diagnostics() {
     ping_tests
     list_network_interfaces
     check_wifi_status
+    dns_resolution_test
+    gateway_reachability_test
 }
 
 # Functions for diagnostics
@@ -221,6 +222,21 @@ check_wifi_status() {
     run_and_log "wpa_cli status"
 }
 
+dns_resolution_test() {
+    section_header "DNS Resolution Test"
+    run_and_log "drill google.com"
+}
+
+gateway_reachability_test() {
+    section_header "Gateway Reachability Test"
+    GATEWAY=$(netstat -rn | grep '^default' | awk '{print $2}')
+    if [ -n "$GATEWAY" ]; then
+        run_and_log "ping -c 3 $GATEWAY"
+    else
+        echo "No default gateway found." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    fi
+}
+
 # Interactive mode
 if [ "$INTERACTIVE" -eq 1 ]; then
     while true; do
@@ -252,13 +268,19 @@ if [ "$INTERACTIVE" -eq 1 ]; then
                 check_wifi_status
                 ;;
             9)
-                run_all_diagnostics
+                dns_resolution_test
                 ;;
             10)
+                gateway_reachability_test
+                ;;
+            11)
+                run_all_diagnostics
+                ;;
+            12)
                 exit 0
                 ;;
             *)
-                echo "Invalid choice. Please enter a number between 1 and 10."
+                echo "Invalid choice. Please enter a number between 1 and 12."
                 ;;
         esac
     done
