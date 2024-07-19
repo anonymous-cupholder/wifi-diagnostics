@@ -80,12 +80,6 @@ run_and_log() {
     fi
 }
 
-# Pause and prompt user to continue
-pause() {
-    echo -e "\nPress [Enter] to continue..."
-    read -r _
-}
-
 # Display usage information
 display_usage() {
     echo "Usage: $0 [-v] [-i]" | tee -a "$LOG_FILE" "$RESULTS_FILE"
@@ -164,33 +158,28 @@ run_all_diagnostics() {
 system_information() {
     section_header "Operating System Information"
     run_and_log "uname -a"
-    pause
 }
 
 pci_devices_configuration() {
     section_header "PCI Devices Configuration List (verbose)"
     run_and_log "pciconf -lv"
-    pause
 }
 
 usb_devices_configuration() {
     section_header "USB Devices Configuration List"
     run_and_log "usbconfig list"
     run_and_log "usbconfig dump_device_desc"
-    pause
 }
 
 kernel_loaded_modules() {
     section_header "Kernel Loaded Modules"
     run_and_log "kldstat"
-    pause
 }
 
 output_configuration_files() {
     output_file_contents "$LOADER_CONF"
     output_file_contents "$RC_CONF"
     output_file_contents "$WPA_SUPPLICANT_CONF"
-    pause
 }
 
 ping_tests() {
@@ -199,7 +188,6 @@ ping_tests() {
     run_and_log "ping -c 3 208.67.222.222"
     run_and_log "ping -c 3 he.net"
     run_and_log "ping -c 3 63.231.92.27"
-    pause
 }
 
 # Interactive mode
