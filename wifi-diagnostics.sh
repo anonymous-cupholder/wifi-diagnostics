@@ -4,7 +4,7 @@
 
 # Ensure the script is running on GhostBSD
 if ! grep -q 'ID="ghostbsd"' /etc/os-release; then
-    echo "This script is intended for GhostBSD only."
+    echo "Error: This script is intended for GhostBSD only."
     exit 1
 fi
 
@@ -31,7 +31,7 @@ output_file_contents() {
         echo -e "\nContents of ${file}:\n" | tee -a "$LOG_FILE" "$RESULTS_FILE"
         cat "$file" | tee -a "$LOG_FILE" "$RESULTS_FILE"
     else
-        echo -e "\nFile ${file} does not exist.\n" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo -e "\nError: File ${file} does not exist.\n" | tee -a "$LOG_FILE" "$RESULTS_FILE"
     fi
 }
 
@@ -47,15 +47,15 @@ section_header() {
 check_command() {
     local cmd=$1
     if ! command -v "$cmd" > /dev/null; then
-        echo "Command not found: $cmd. Please install it." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Error: Command not found: $cmd. Please install it." | tee -a "$LOG_FILE" "$RESULTS_FILE"
         exit 1
     fi
 }
 
 # Check if the script is run as root
 check_root() {
-    if [ "$(id -u)" -ne 0 ]; then
-        echo "Run this script as root." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    if [ "$(id -u)" -ne 0; then
+        echo "Error: Run this script as root." | tee -a "$LOG_FILE" "$RESULTS_FILE"
         exit 1
     fi
 }
