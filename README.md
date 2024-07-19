@@ -1,92 +1,74 @@
 # wifi-diagnostics.sh
 
-© 2024 Anonymous Cupholder
+© 2024 A.K. Aunby
 
-## Purpose
+## Overview
 
-The `wifi-diagnostics.sh` script collects and logs networking information to help diagnose GhostBSD Wi-Fi issues.
-
-## Prerequisites
-
-0. GhostBSD
-1. Root access.
-2. Required commands: `uname`, `pciconf`, `usbconfig`, `kldstat`, `cat`, `ifconfig`, `ping`, `service`, `killall`, `netstat`, `sockstat`, `wpa_supplicant`.
-3. Ensure the script has execute permissions.
-
-## Installation
-
-1. **Download the Script**
-
-    Download the `wifi-diagnostics.sh` script to your local machine.
-
-2. **Set Execute Permissions**
-
-    ```sh
-    chmod +x wifi-diagnostics.sh
-    ```
+`wifi-diagnostics.sh` is a shell script designed to help diagnose and gather information about networking hardware and configurations on GhostBSD systems. It collects various details about the system, including PCI and USB device configurations, kernel modules, and network configuration files, to assist in troubleshooting network issues.
 
 ## Usage
 
-1. **Run the Script**
+### Basic Usage
 
-    ```sh
-    ./wifi-diagnostics.sh
-    ```
+Set execute privilege for the script:
+```
+chmod +x wifi-diagnostics.sh
+```
 
-2. **Output Files**
+Run the script:
+```
+./wifi-diagnostics.sh
+```
 
-    The script generates two output files:
-    - `wifi_diagnostic_results.log`: Detailed log of the script execution.
-    - `wifi_diagnostic_results.txt`: Summary of the diagnostic results.
+### Options
 
-## Sections in the Script
+- `-v` : Enable verbose mode. This will provide more detailed output.
+- `-i` : Enable interactive mode. This allows you to select which diagnostics to run.
 
-1. **Operating System Information**
-    - Collects OS details using `uname -a`.
+### Example
 
-2. **PCI Devices Configuration**
-    - Lists PCI device details using `pciconf -lv`.
+Run the script in interactive mode:
+```
+./wifi-diagnostics.sh -i
+```
 
-3. **USB Devices Configuration**
-    - Lists USB devices and details using `usbconfig list` and `usbconfig dump_device_desc`.
+## Diagnostics
 
-4. **Kernel Loaded Modules**
-    - Lists loaded kernel modules using `kldstat`.
+The script provides the following diagnostics:
 
-5. **Networking Forum Posts and Documentation**
-    - Provides links to relevant forum posts and documentation for further reading.
+1. **System Information**: Collects basic system information using `uname`.
+2. **PCI Devices Configuration**: Lists PCI device configurations using `pciconf`.
+3. **USB Devices Configuration**: Lists USB device configurations using `usbconfig`.
+4. **Kernel Loaded Modules**: Lists currently loaded kernel modules using `kldstat`.
+5. **Output Configuration Files**: Displays contents of key network configuration files (`/boot/loader.conf`, `/etc/rc.conf`, and `/etc/wpa_supplicant.conf`).
+6. **Ping Tests**: Performs a series of ping tests to check network connectivity.
 
-6. **Configuration Files**
-    - Outputs the contents of `/boot/loader.conf`, `/etc/rc.conf`, and `/etc/wpa_supplicant.conf`.
+### Interactive Mode
 
-7. **Device Creation Command**
-    - Provides instructions to create Wi-Fi device.
+In interactive mode, you will be presented with a menu to select the diagnostics you want to run:
 
-8. **Firmware Availability Check**
-    - Instructions to check firmware availability and loading.
+```
+Select diagnostics to run:
+1) System Information
+2) PCI Devices Configuration
+3) USB Devices Configuration
+4) Kernel Loaded Modules
+5) Output Configuration Files
+6) Ping Tests
+7) All of the above
+8) Exit
+Enter your choice [1-8]: 
+```
 
-9. **RealTek RTL8188CE Wi-Fi PCI Setup**
-    - Specific setup instructions for RealTek RTL8188CE Wi-Fi PCI devices.
+## Output
 
-10. **Commands for wpa_supplicant and dhclient**
-    - Provides commands to run `wpa_supplicant` and `dhclient` manually.
+The script logs all outputs to the following files:
+- `wifi_diagnostic_results.log`: Detailed log file containing all command outputs.
+- `wifi_diagnostic_results.txt`: Summary file containing key information.
 
-11. **Network Interface and Socket Connections**
-    - Lists network interface and socket connections using `netstat` and `sockstat`.
+## Additional Help
 
-12. **Ping Tests**
-    - Runs several `ping` tests to verify network connectivity.
+For more help, visit the [GhostBSD Telegram group](https://t.me/GhostBSD) or IRC chat group. Post a copy of the outputs to pastebin.com and share the URL link for review.
 
-13. **Additional Help**
-    - Provides information on where to seek further help (e.g., GhostBSD Telegram group).
 
-## Troubleshooting
-
-- Ensure you have root privileges when running the script.
-- Verify all required commands are installed.
-- Check the log files for any errors or warnings.
-
-## Notes
-
-- This script is intended for diagnostic purposes only.
-- For further assistance, visit the GhostBSD community forums or contact support.
+This `README.md` provides a clear overview of the script, its usage, options, and the diagnostics it performs. It also includes instructions for running the script and a description of the output files.
