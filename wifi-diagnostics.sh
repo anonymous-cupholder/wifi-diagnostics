@@ -101,9 +101,10 @@ interactive_menu() {
     echo "4) Kernel Loaded Modules"
     echo "5) Output Configuration Files"
     echo "6) Ping Tests"
-    echo "7) All of the above"
-    echo "8) Exit"
-    echo -n "Enter your choice [1-8]: "
+    echo "7) List Network Interfaces"
+    echo "8) All of the above"
+    echo "9) Exit"
+    echo -n "Enter your choice [1-9]: "
     read -r choice
     return $choice
 }
@@ -153,6 +154,7 @@ run_all_diagnostics() {
     kernel_loaded_modules
     output_configuration_files
     ping_tests
+    list_network_interfaces
 }
 
 # Functions for diagnostics
@@ -191,6 +193,11 @@ ping_tests() {
     run_and_log "ping -c 3 63.231.92.27"
 }
 
+list_network_interfaces() {
+    section_header "Available Network Interfaces"
+    run_and_log "ifconfig -a"
+}
+
 # Interactive mode
 if [ $INTERACTIVE -eq 1 ]; then
     while true; do
@@ -216,13 +223,16 @@ if [ $INTERACTIVE -eq 1 ]; then
                 ping_tests
                 ;;
             7)
-                run_all_diagnostics
+                list_network_interfaces
                 ;;
             8)
+                run_all_diagnostics
+                ;;
+            9)
                 exit 0
                 ;;
             *)
-                echo "Invalid choice. Please enter a number between 1 and 8."
+                echo "Invalid choice. Please enter a number between 1 and 9."
                 ;;
         esac
     done
