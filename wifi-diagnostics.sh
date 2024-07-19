@@ -82,19 +82,41 @@ run_and_log() {
 
 # Display usage information
 display_usage() {
-    echo "Usage: $0 [-v]" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    echo "Usage: $0 [-v] [-i]" | tee -a "$LOG_FILE" "$RESULTS_FILE"
     echo "Collects info to get networking working on your hardware." | tee -a "$LOG_FILE" "$RESULTS_FILE"
     echo "Set execute privilege: chmod +x wifi-diagnostics.sh" | tee -a "$LOG_FILE" "$RESULTS_FILE"
     echo "Run: wifi-diagnostics.sh" | tee -a "$LOG_FILE" "$RESULTS_FILE"
-    echo "Options: -v  Enable verbose mode" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    echo "Options:" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    echo "  -v  Enable verbose mode" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    echo "  -i  Enable interactive mode" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+}
+
+# Interactive mode menu
+interactive_menu() {
+    echo "Select diagnostics to run:"
+    echo "1) System Information"
+    echo "2) PCI Devices Configuration"
+    echo "3) USB Devices Configuration"
+    echo "4) Kernel Loaded Modules"
+    echo "5) Output Configuration Files"
+    echo "6) Ping Tests"
+    echo "7) All of the above"
+    echo "8) Exit"
+    echo -n "Enter your choice [1-8]: "
+    read choice
+    return $choice
 }
 
 # Parse command-line options
 VERBOSE=0
-while getopts "v" opt; do
+INTERACTIVE=0
+while getopts "vi" opt; do
     case $opt in
         v)
             VERBOSE=1
+            ;;
+        i)
+            INTERACTIVE=1
             ;;
         *)
             display_usage
@@ -122,131 +144,91 @@ chmod +x "$0"
 # Display usage information
 display_usage
 
-# System information
-section_header "Operating System Information"
-run_and_log "uname -a"
-
-# PCI devices configuration
-section_header "PCI Devices Configuration List (verbose)"
-run_and_log "pciconf -lv"
-
-# USB devices configuration
-section_header "USB Devices Configuration List"
-run_and_log "usbconfig list"
-run_and_log "usbconfig dump_device_desc"
-
-# Kernel loaded modules
-section_header "Kernel Loaded Modules"
-run_and_log "kldstat"
-
-# Forum posts and documentation
-section_header "Networking Forum Posts and Documentation"
-cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-Read Networking Forum posts at https://forums.ghostbsd.org/viewtopic.php?f=64&t=16
-USB wifi device Edimax EW-7811 post & PCI wifi device RTL8188CE post:
-PCI device RealTek RTL8188CE: https://forums.ghostbsd.org/viewtopic.php?f=64&t=570
-USB device Edimax EW-7811un: https://forums.ghostbsd.org/viewtopic.php?f=64&t=526
-
-Refer to PDF files at /usr/share/doc/?xxxx? for wifi setup examples.
-EOF
-
-# Output configuration files
-output_file_contents "$LOADER_CONF"
-output_file_contents "$RC_CONF"
-output_file_contents "$WPA_SUPPLICANT_CONF"
-
-# Device creation instructions
-section_header "Device Creation Command"
-cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-Create your device with:
-ifconfig wlan0 create wlandev rtwn0
-
-Or use the -HT option:
-ifconfig -HT wlan0 create wlandev rtwn0
-
-Substitute <your device name> for rtwn0.
-EOF
-
-# Firmware availability
-section_header "Firmware Availability Check"
-cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-Is the firmware for your wifi device available in this directory ?xxxx?
-Did it load into your wifi device?
-Did you acknowledge the Copyright Notice in /boot/loader.conf?
-EOF
-
-# Configuration for RealTek RTL8188CE
-section_header "RealTek RTL8188CE Wi-Fi PCI Setup"
-cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-Refer to GhostBSD Forums post: https://forums.ghostbsd.org/viewtopic.php?f=64&t=570
-
-Add these lines to /boot/loader.conf:
-boot_verbose="YES"
-# verbose_loading="YES"
-kld_list="geom_mirror geom_journal geom_eli linux if_rtwn_pci if_rtwn"
-# add if_rtwn and if_rtwn_pci to kld_list
-# if_wlan_load="YES"
-if_rtwn_pci_load="YES"
-if_rtwn_load="YES"
-rtwn-rtl8192cfwE_B_load="YES"
-rtwn-rtl8192cfwE_load="YES"
-legal.realtek.license_ack=1
-
-Add these lines to /etc/rc.conf:
-wlans_rtwn0="wlan0"
-ifconfig_wlan0="WPA SYNCDHCP"
-
-Add to /etc/wpa_supplicant.conf:
-network={
-    ssid="innflux"
-    key_mgmt=NONE
+# Function to run all diagnostics
+run_all_diagnostics() {
+    system_information
+    pci_devices_configuration
+    usb_devices_configuration
+    kernel_loaded_modules
+    output_configuration_files
+    ping_tests
 }
-EOF
 
-# Commands for wpa_supplicant and dhclient
-section_header "Commands for wpa_supplicant and dhclient"
-cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-Manually run:
-killall dhclient
-wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant.conf
-dhclient wlan0
+# Functions for diagnostics
+system_information() {
+    section_header "Operating System Information"
+    run_and_log "uname -a"
+}
 
-For debugging, use:
-killall dhclient
-service netif restart
-service routing restart
-wpa_supplicant -d -K -i wlan0 -c /etc/wpa_supplicant.conf
-dhclient wlan0
+pci_devices_configuration() {
+    section_header "PCI Devices Configuration List (verbose)"
+    run_and_log "pciconf -lv"
+}
 
-If dhclient fails, kill it and try again:
-killall dhclient
-dhclient wlan0
-EOF
+usb_devices_configuration() {
+    section_header "USB Devices Configuration List"
+    run_and_log "usbconfig list"
+    run_and_log "usbconfig dump_device_desc"
+}
 
-# Network interface and socket connections
-section_header "Network Interface and Socket Connections"
-run_and_log "netstat -r"
-run_and_log "netstat -i"
-run_and_log "sockstat -4"
+kernel_loaded_modules() {
+    section_header "Kernel Loaded Modules"
+    run_and_log "kldstat"
+}
 
-# Ping tests
-section_header "Ping Tests"
-cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-Ping Google DNS 3 times:
-ping -c 3 8.8.8.8
+output_configuration_files() {
+    output_file_contents "$LOADER_CONF"
+    output_file_contents "$RC_CONF"
+    output_file_contents "$WPA_SUPPLICANT_CONF"
+}
 
-Ping OpenDNS 3 times:
-ping -c 3 208.67.222.222
+ping_tests() {
+    section_header "Ping Tests"
+    run_and_log "ping -c 3 8.8.8.8"
+    run_and_log "ping -c 3 208.67.222.222"
+    run_and_log "ping -c 3 he.net"
+    run_and_log "ping -c 3 63.231.92.27"
+}
 
-Ping Hurricane Electric 3 times:
-ping -c 3 he.net
-
-Ping OpenNic DNS in Colorado:
-ping -c 3 63.231.92.27
-
-Sometimes restart network interfaces and routing after editing /etc/rc.conf or /etc/wpa_supplicant.conf:
-service netif restart && service routing restart
-EOF
+# Interactive mode
+if [ $INTERACTIVE -eq 1 ]; then
+    while true; do
+        interactive_menu
+        choice=$?
+        case $choice in
+            1)
+                system_information
+                ;;
+            2)
+                pci_devices_configuration
+                ;;
+            3)
+                usb_devices_configuration
+                ;;
+            4)
+                kernel_loaded_modules
+                ;;
+            5)
+                output_configuration_files
+                ;;
+            6)
+                ping_tests
+                ;;
+            7)
+                run_all_diagnostics
+                ;;
+            8)
+                exit 0
+                ;;
+            *)
+                echo "Invalid choice. Please enter a number between 1 and 8."
+                ;;
+        esac
+    done
+else
+    # Run all diagnostics if not in interactive mode
+    run_all_diagnostics
+fi
 
 # Additional help
 section_header "Additional Help"
