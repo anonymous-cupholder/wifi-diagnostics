@@ -1,6 +1,6 @@
 # wifi-diagnostics.sh
 
-© 2024 A.K. Aunby
+© 2024 Anonymous Cupholder
 
 ## Overview
 
@@ -11,12 +11,12 @@
 ### Basic Usage
 
 Set execute privilege for the script:
-```
+```sh
 chmod +x wifi-diagnostics.sh
 ```
 
 Run the script:
-```
+```sh
 ./wifi-diagnostics.sh
 ```
 
@@ -28,8 +28,8 @@ Run the script:
 ### Example
 
 Run the script in interactive mode:
-```
-./wifi-diagnostics.sh -i
+```sh
+sudo ./wifi-diagnostics.sh -i
 ```
 
 ## Diagnostics
@@ -42,6 +42,10 @@ The script provides the following diagnostics:
 4. **Kernel Loaded Modules**: Lists currently loaded kernel modules using `kldstat`.
 5. **Output Configuration Files**: Displays contents of key network configuration files (`/boot/loader.conf`, `/etc/rc.conf`, and `/etc/wpa_supplicant.conf`).
 6. **Ping Tests**: Performs a series of ping tests to check network connectivity.
+7. **List Network Interfaces**: Lists all available network interfaces using `ifconfig -a`.
+8. **Check Wi-Fi Connection Status**: Checks the status of the Wi-Fi connection using `ifconfig wlan0` and `wpa_cli status`.
+9. **DNS Resolution Test**: Tests DNS resolution using `drill`.
+10. **Gateway Reachability Test**: Tests the reachability of the default gateway using `ping`.
 
 ### Interactive Mode
 
@@ -55,9 +59,13 @@ Select diagnostics to run:
 4) Kernel Loaded Modules
 5) Output Configuration Files
 6) Ping Tests
-7) All of the above
-8) Exit
-Enter your choice [1-8]: 
+7) List Network Interfaces
+8) Check Wi-Fi Connection Status
+9) DNS Resolution Test
+10) Gateway Reachability Test
+11) All of the above
+12) Exit
+Enter your choice [1-12]: 
 ```
 
 ## Output
@@ -68,7 +76,4 @@ The script logs all outputs to the following files:
 
 ## Additional Help
 
-For more help, visit the [GhostBSD Telegram group](https://t.me/GhostBSD) or IRC chat group. Post a copy of the outputs to pastebin.com and share the URL link for review.
-
-
-This `README.md` provides a clear overview of the script, its usage, options, and the diagnostics it performs. It also includes instructions for running the script and a description of the output files.
+For more help, visit the [GhostBSD Telegram group](https://t.me/GhostBSD) or IRC chat group. Post a copy of these outputs to pastebin.com and share the URL link for review.
