@@ -108,6 +108,76 @@ display_usage() {
     echo "  -i  Enable interactive mode" | tee -a "$LOG_FILE" "$RESULTS_FILE"
 }
 
+# Add WiFi driver entries to /boot/loader.conf
+add_loader_conf_entries() {
+    local device=$1
+    case "$device" in
+        rtwn0)
+            echo 'if_rtwn_load="YES"' >> /boot/loader.conf
+            echo 'if_rtwn_pci_load="YES"' >> /boot/loader.conf
+            echo 'if_rtwn_usb_load="YES"' >> /boot/loader.conf
+            echo 'rtwn-rtl8192cfwU_load="YES"' >> /boot/loader.conf
+            echo 'rtwn-rtl8192cfwE_load="YES"' >> /boot/loader.conf
+            echo 'rtwn-rtl8188eufw_load="YES"' >> /boot/loader.conf
+            ;;
+        rsu0)
+            echo 'if_rsu_load="YES"' >> /boot/loader.conf
+            echo 'rsu-rtl8712fw_load="YES"' >> /boot/loader.conf
+            ;;
+        iwn0)
+            echo 'if_iwn_load="YES"' >> /boot/loader.conf
+            echo 'iwn4965fw_load="YES"' >> /boot/loader.conf
+            echo 'iwn1000fw_load="YES"' >> /boot/loader.conf
+            echo 'iwn5000fw_load="YES"' >> /boot/loader.conf
+            echo 'iwn5150fw_load="YES"' >> /boot/loader.conf
+            echo 'iwn6000fw_load="YES"' >> /boot/loader.conf
+            echo 'iwn6000g2afw_load="YES"' >> /boot/loader.conf
+            echo 'iwn6000g2bfw_load="YES"' >> /boot/loader.conf
+            echo 'iwn6050fw_load="YES"' >> /boot/loader.conf
+            ;;
+        iwm0)
+            echo 'if_iwm_load="YES"' >> /boot/loader.conf
+            echo 'iwm3160fw_load="YES"' >> /boot/loader.conf
+            echo 'iwm7260fw_load="YES"' >> /boot/loader.conf
+            echo 'iwm7265fw_load="YES"' >> /boot/loader.conf
+            ;;
+        ath0)
+            echo 'if_ath_load="YES"' >> /boot/loader.conf
+            ;;
+        ral0)
+            echo 'if_ral_load="YES"' >> /boot/loader.conf
+            ;;
+        run0)
+            echo 'if_run_load="YES"' >> /boot/loader.conf
+            echo 'runfw_load="YES"' >> /boot/loader.conf
+            ;;
+        bwn0)
+            echo 'if_bwn_load="YES"' >> /boot/loader.conf
+            echo 'bwn_v4_ucode_load="YES"' >> /boot/loader.conf
+            echo 'bwn_v4_lp_ucode_load="YES"' >> /boot/loader.conf
+            echo 'bwn_v4_n_ucode_load="YES"' >> /boot/loader.conf
+            ;;
+        bwi0)
+            echo 'if_bwi_load="YES"' >> /boot/loader.conf
+            echo 'bwi_v3_ucode_load="YES"' >> /boot/loader.conf
+            ;;
+        urtwn0)
+            echo 'if_urtwn_load="YES"' >> /boot/loader.conf
+            echo 'urtwn-rtl8192cfwT_load="YES"' >> /boot/loader.conf
+            echo 'urtwn-rtl8192cfwU_load="YES"' >> /boot/loader.conf
+            ;;
+        zyd0)
+            echo 'if_zyd_load="YES"' >> /boot/loader.conf
+            ;;
+        *)
+            echo "Error: Unsupported device $device." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+            echo "Supported devices: rtwn0, rsu0, iwn0, iwm0, ath0, ral0, run0, bwn0, bwi0, urtwn0, zyd0." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+            return
+            ;;
+    esac
+    echo "Driver entries for $device added to /boot/loader.conf."
+}
+
 # Configure network interface based on type
 configure_network_interface() {
     section_header "Configure Network Interface"
@@ -126,18 +196,13 @@ configure_network_interface() {
     read -r device
 
     case "$device" in
-        rtwn0)
-            run_and_log "ifconfig wlan0 create wlandev rtwn0"
-            ;;
-        iwn0)
-            run_and_log "ifconfig wlan0 create wlandev iwn0"
-            ;;
-        ath0)
-            run_and_log "ifconfig wlan0 create wlandev ath0"
+        rtwn0 | rsu0 | iwn0 | iwm0 | ath0 | ral0 | run0 | bwn0 | bwi0 | urtwn0 | zyd0)
+            run_and_log "ifconfig wlan0 create wlandev $device"
+            add_loader_conf_entries "$device"
             ;;
         *)
             echo "Error: Unsupported device $device." | tee -a "$LOG_FILE" "$RESULTS_FILE"
-            echo "Supported devices: rtwn0, iwn0, ath0." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+            echo "Supported devices: rtwn0, rsu0, iwn0, iwm0, ath0, ral0, run0, bwn0, bwi0, urtwn0, zyd0." | tee -a "$LOG_FILE" "$RESULTS_FILE"
             return
             ;;
     esac
