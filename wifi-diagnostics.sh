@@ -12,12 +12,27 @@ fi
 LOADER_CONF="/boot/loader.conf"
 RC_CONF="/etc/rc.conf"
 WPA_SUPPLICANT_CONF="/etc/wpa_supplicant.conf"
-LOG_FILE="wifi_diagnostic_results.log"
-RESULTS_FILE="wifi_diagnostic_results.txt"
+LOG_DIR="./logs"
+LOG_FILE="$LOG_DIR/wifi_diagnostic_results.log"
+RESULTS_FILE="$LOG_DIR/wifi_diagnostic_results.txt"
 BACKUP_DIR="./backup"
 
-# Create backup directory
+# Create necessary directories
+mkdir -p "$LOG_DIR"
 mkdir -p "$BACKUP_DIR"
+
+# Log rotation
+rotate_logs() {
+    if [ -f "$LOG_FILE" ]; then
+        mv "$LOG_FILE" "$LOG_FILE.$(date +'%Y%m%d%H%M%S')"
+    fi
+    if [ -f "$RESULTS_FILE" ]; then
+        mv "$RESULTS_FILE" "$RESULTS_FILE.$(date +'%Y%m%d%H%M%S')"
+    fi
+}
+
+# Rotate logs to avoid overwriting
+rotate_logs
 
 # Backup configuration files
 backup_file() {
