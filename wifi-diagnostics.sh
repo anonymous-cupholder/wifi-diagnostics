@@ -111,6 +111,12 @@ restart_network_services() {
     section_header "Restarting Network Services"
     run_and_log "service netif restart"
     run_and_log "service routing restart"
+    INTERFACE=$(ifconfig -l | grep -E 're|em|igb|ix|fxp|bge|rl|dc|vr|wlan|ath|iwn|iwm|ral|bwn|bwi' | awk '{print $1}')
+    if [ -n "$INTERFACE" ]; then
+        run_and_log "dhclient $INTERFACE"
+    else
+        echo "No suitable network interface found to run dhclient." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    fi
 }
 
 # Interactive mode menu
