@@ -4,10 +4,11 @@
 
 ## Purpose
 
-The `wifi-diagnostics.sh` script collects and logs networking information to help diagnose Wi-Fi issues.
+The `wifi-diagnostics.sh` script collects and logs networking information to help diagnose GhostBSD Wi-Fi issues.
 
 ## Prerequisites
 
+0. GhostBSD
 1. Root access.
 2. Required commands: `uname`, `pciconf`, `usbconfig`, `kldstat`, `cat`, `ifconfig`, `ping`, `service`, `killall`, `netstat`, `sockstat`, `wpa_supplicant`.
 3. Ensure the script has execute permissions.
