@@ -1,6 +1,12 @@
 #!/bin/sh
 
-# © 2024 Anonymous Cupholder
+# © 2024 A.K. Aunby
+
+# Ensure the script is running on GhostBSD
+if ! grep -q 'ID="ghostbsd"' /etc/os-release; then
+    echo "This script is intended for GhostBSD only."
+    exit 1
+fi
 
 # File paths
 LOADER_CONF="/boot/loader.conf"
@@ -8,6 +14,15 @@ RC_CONF="/etc/rc.conf"
 WPA_SUPPLICANT_CONF="/etc/wpa_supplicant.conf"
 LOG_FILE="wifi_diagnostic_results.log"
 RESULTS_FILE="wifi_diagnostic_results.txt"
+BACKUP_DIR="./backup"
+
+# Create backup directory
+mkdir -p "$BACKUP_DIR"
+
+# Backup configuration files
+cp "$LOADER_CONF" "$BACKUP_DIR/loader.conf.bak"
+cp "$RC_CONF" "$BACKUP_DIR/rc.conf.bak"
+cp "$WPA_SUPPLICANT_CONF" "$BACKUP_DIR/wpa_supplicant.conf.bak"
 
 # Output file contents
 output_file_contents() {
@@ -54,11 +69,26 @@ run_and_log() {
 
 # Display usage information
 display_usage() {
-    echo "Usage: $0" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    echo "Usage: $0 [-v]" | tee -a "$LOG_FILE" "$RESULTS_FILE"
     echo "Collects info to get networking working on your hardware." | tee -a "$LOG_FILE" "$RESULTS_FILE"
     echo "Set execute privilege: chmod +x wifi-diagnostics.sh" | tee -a "$LOG_FILE" "$RESULTS_FILE"
     echo "Run: wifi-diagnostics.sh" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    echo "Options: -v  Enable verbose mode" | tee -a "$LOG_FILE" "$RESULTS_FILE"
 }
+
+# Parse command-line options
+VERBOSE=0
+while getopts "v" opt; do
+    case $opt in
+        v)
+            VERBOSE=1
+            ;;
+        *)
+            display_usage
+            exit 1
+            ;;
+    esac
+done
 
 # Ensure required commands are available
 required_commands="uname pciconf usbconfig kldstat cat ifconfig ping service killall netstat sockstat wpa_supplicant"
@@ -211,4 +241,3 @@ cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
 For more help, visit the GhostBSD Telegram group: https://t.me/GhostBSD or IRC chat group.
 Post a copy of these outputs to pastebin.com and share the URL link for review.
 EOF
-
