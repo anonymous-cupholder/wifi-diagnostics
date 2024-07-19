@@ -64,7 +64,11 @@ check_root() {
 run_and_log() {
     local cmd="$1"
     echo -e "\nRunning: $cmd\n" | tee -a "$LOG_FILE" "$RESULTS_FILE"
-    eval "$cmd" 2>&1 | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    if [ $VERBOSE -eq 1 ]; then
+        eval "$cmd" 2>&1 | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    else
+        eval "$cmd" >> "$LOG_FILE" 2>&1
+    fi
 }
 
 # Display usage information
