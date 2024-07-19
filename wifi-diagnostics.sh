@@ -78,7 +78,7 @@ check_command() {
 
 # Check if the script is run as root
 check_root() {
-    if [ "$(id -u)" -ne 0; then
+    if [ "$(id -u)" -ne 0 ]; then
         echo "Error: Run this script as root." | tee -a "$LOG_FILE" "$RESULTS_FILE"
         exit 1
     fi
@@ -88,7 +88,7 @@ check_root() {
 run_and_log() {
     local cmd="$1"
     echo -e "\nRunning: $cmd\n" | tee -a "$LOG_FILE" "$RESULTS_FILE"
-    if [ $VERBOSE -eq 1 ]; then
+    if [ "$VERBOSE" -eq 1 ]; then
         eval "$cmd" 2>&1 | tee -a "$LOG_FILE" "$RESULTS_FILE"
     else
         eval "$cmd" 2>&1 | tee -a "$LOG_FILE" "$RESULTS_FILE"
@@ -129,7 +129,7 @@ interactive_menu() {
 VERBOSE=0
 INTERACTIVE=0
 while getopts "vi" opt; do
-    case $opt in
+    case "$opt" in
         v)
             VERBOSE=1
             ;;
@@ -222,11 +222,11 @@ check_wifi_status() {
 }
 
 # Interactive mode
-if [ $INTERACTIVE -eq 1 ]; then
+if [ "$INTERACTIVE" -eq 1 ]; then
     while true; do
         interactive_menu
         choice=$?
-        case $choice in
+        case "$choice" in
             1)
                 system_information
                 ;;
