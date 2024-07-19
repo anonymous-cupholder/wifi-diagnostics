@@ -93,6 +93,7 @@ display_usage() {
 
 # Interactive mode menu
 interactive_menu() {
+    echo -e "\n"
     echo "Select diagnostics to run:"
     echo "1) System Information"
     echo "2) PCI Devices Configuration"
