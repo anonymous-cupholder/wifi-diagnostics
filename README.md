@@ -46,9 +46,10 @@ The script provides the following diagnostics:
 8. **USB Devices Configuration**: Lists USB device configurations using `usbconfig`.
 9. **PCI Devices Configuration**: Lists PCI device configurations using `pciconf`.
 10. **System Information**: Collects basic system information using `uname`.
-11. **Restart Network Services**: Restarts network services if issues are detected.
-12. **All of the above**: Run all diagnostics.
-13. **Exit**: Exit the script.
+11. **Configure Network Interface**: Configures the network interface with the provided SSID and password based on the device type (e.g., rtwn0, iwn0, ath0).
+12. **Restart Network Services**: Restarts network services if issues are detected.
+13. **All of the above**: Run all diagnostics.
+14. **Exit**: Exit the script.
 
 ### Interactive Mode
 
@@ -66,10 +67,11 @@ Select diagnostics to run:
 8) USB Devices Configuration
 9) PCI Devices Configuration
 10) System Information
-11) Restart Network Services
-12) All of the above
-13) Exit
-Enter your choice [1-13]: 
+11) Configure Network Interface
+12) Restart Network Services
+13) All of the above
+14) Exit
+Enter your choice [1-14]: 
 ```
 
 ## Output
