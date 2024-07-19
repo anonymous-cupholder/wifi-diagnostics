@@ -76,14 +76,14 @@ run_and_log() {
     if [ $VERBOSE -eq 1 ]; then
         eval "$cmd" 2>&1 | tee -a "$LOG_FILE" "$RESULTS_FILE"
     else
-        eval "$cmd" >> "$LOG_FILE" 2>&1
+        eval "$cmd" 2>&1 | tee -a "$LOG_FILE" "$RESULTS_FILE"
     fi
 }
 
 # Pause and prompt user to continue
 pause() {
     echo -e "\nPress [Enter] to continue..."
-    read -r
+    read -r _
 }
 
 # Display usage information
