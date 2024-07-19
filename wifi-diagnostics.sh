@@ -108,6 +108,70 @@ display_usage() {
     echo "  -i  Enable interactive mode" | tee -a "$LOG_FILE" "$RESULTS_FILE"
 }
 
+# Configure network interface based on type
+configure_network_interface() {
+    section_header "Configure Network Interface"
+    run_and_log "ifconfig"
+    
+    # Ask the user to input SSID and password
+    echo -n "Enter SSID: "
+    read -r ssid
+    echo -n "Enter PSK (password): "
+    read -r psk
+    
+    # Create wireless interface based on the device type
+    echo "Available wireless interfaces:"
+    run_and_log "ifconfig -a | grep wlan"
+    echo -n "Enter the wireless device name (e.g., rtwn0): "
+    read -r device
+
+    case "$device" in
+        rtwn0)
+            run_and_log "ifconfig wlan0 create wlandev rtwn0"
+            ;;
+        iwn0)
+            run_and_log "ifconfig wlan0 create wlandev iwn0"
+            ;;
+        ath0)
+            run_and_log "ifconfig wlan0 create wlandev ath0"
+            ;;
+        *)
+            echo "Error: Unsupported device $device." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+            echo "Supported devices: rtwn0, iwn0, ath0." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+            return
+            ;;
+    esac
+
+    echo "Editing /etc/wpa_supplicant.conf..."
+    if [ -f "$WPA_SUPPLICANT_CONF" ]; then
+        backup_file "$WPA_SUPPLICANT_CONF"
+        echo "network={
+    ssid=\"$ssid\"
+    psk=\"$psk\"
+}" >> "$WPA_SUPPLICANT_CONF"
+        echo "Configuration added to /etc/wpa_supplicant.conf."
+    else
+        echo "Error: /etc/wpa_supplicant.conf not found." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Suggestion: Create the file and add the network configuration manually." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        return
+    fi
+
+    echo "Editing /etc/rc.conf..."
+    if [ -f "$RC_CONF" ]; then
+        backup_file "$RC_CONF"
+        echo "wlans_$device=\"wlan0\"
+ifconfig_wlan0=\"WPA SYNCDHCP\"" >> "$RC_CONF"
+        echo "Configuration added to /etc/rc.conf."
+    else
+        echo "Error: /etc/rc.conf not found." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Suggestion: Create the file and add the network configuration manually." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        return
+    fi
+
+    echo "Network interface configuration complete. Restarting network services..."
+    restart_network_services
+}
+
 # Restart network services
 restart_network_services() {
     section_header "Restarting Network Services"
@@ -136,10 +200,11 @@ interactive_menu() {
     echo "8) USB Devices Configuration"
     echo "9) PCI Devices Configuration"
     echo "10) System Information"
-    echo "11) Restart Network Services"
-    echo "12) All of the above"
-    echo "13) Exit"
-    echo -n "Enter your choice [1-13]: "
+    echo "11) Configure Network Interface"
+    echo "12) Restart Network Services"
+    echo "13) All of the above"
+    echo "14) Exit"
+    echo -n "Enter your choice [1-14]: "
     read -r choice
     return $choice
 }
@@ -190,6 +255,7 @@ run_all_diagnostics() {
     usb_devices_configuration
     pci_devices_configuration
     system_information
+    configure_network_interface
     restart_network_services
 }
 
@@ -298,16 +364,19 @@ if [ "$INTERACTIVE" -eq 1 ]; then
                 system_information
                 ;;
             11)
-                restart_network_services
+                configure_network_interface
                 ;;
             12)
-                run_all_diagnostics
+                restart_network_services
                 ;;
             13)
+                run_all_diagnostics
+                ;;
+            14)
                 exit 0
                 ;;
             *)
-                echo "Invalid choice. Please enter a number between 1 and 13."
+                echo "Invalid choice. Please enter a number between 1 and 14."
                 ;;
         esac
     done
