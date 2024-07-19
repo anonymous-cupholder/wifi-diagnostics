@@ -20,9 +20,18 @@ BACKUP_DIR="./backup"
 mkdir -p "$BACKUP_DIR"
 
 # Backup configuration files
-cp "$LOADER_CONF" "$BACKUP_DIR/loader.conf.bak"
-cp "$RC_CONF" "$BACKUP_DIR/rc.conf.bak"
-cp "$WPA_SUPPLICANT_CONF" "$BACKUP_DIR/wpa_supplicant.conf.bak"
+backup_file() {
+    local file=$1
+    local backup="$BACKUP_DIR/$(basename "$file").bak"
+    if [ -f "$file" ]; then
+        cp "$file" "$backup"
+        echo "Backup of $file created at $backup" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    fi
+}
+
+backup_file "$LOADER_CONF"
+backup_file "$RC_CONF"
+backup_file "$WPA_SUPPLICANT_CONF"
 
 # Output file contents
 output_file_contents() {
