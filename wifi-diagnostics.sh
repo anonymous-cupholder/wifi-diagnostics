@@ -102,9 +102,10 @@ interactive_menu() {
     echo "5) Output Configuration Files"
     echo "6) Ping Tests"
     echo "7) List Network Interfaces"
-    echo "8) All of the above"
-    echo "9) Exit"
-    echo -n "Enter your choice [1-9]: "
+    echo "8) Check Wi-Fi Connection Status"
+    echo "9) All of the above"
+    echo "10) Exit"
+    echo -n "Enter your choice [1-10]: "
     read -r choice
     return $choice
 }
@@ -155,6 +156,7 @@ run_all_diagnostics() {
     output_configuration_files
     ping_tests
     list_network_interfaces
+    check_wifi_status
 }
 
 # Functions for diagnostics
@@ -198,6 +200,12 @@ list_network_interfaces() {
     run_and_log "ifconfig -a"
 }
 
+check_wifi_status() {
+    section_header "Wi-Fi Connection Status"
+    run_and_log "ifconfig wlan0"
+    run_and_log "wpa_cli status"
+}
+
 # Interactive mode
 if [ $INTERACTIVE -eq 1 ]; then
     while true; do
@@ -226,13 +234,16 @@ if [ $INTERACTIVE -eq 1 ]; then
                 list_network_interfaces
                 ;;
             8)
-                run_all_diagnostics
+                check_wifi_status
                 ;;
             9)
+                run_all_diagnostics
+                ;;
+            10)
                 exit 0
                 ;;
             *)
-                echo "Invalid choice. Please enter a number between 1 and 9."
+                echo "Invalid choice. Please enter a number between 1 and 10."
                 ;;
         esac
     done
