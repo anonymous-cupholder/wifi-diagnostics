@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# © 2024 A.K. Aunby
+# © 2024 Anonymous Cupholder
 
 # Ensure the script is running on GhostBSD
 if ! grep -q 'ID="ghostbsd"' /etc/os-release; then
@@ -78,7 +78,7 @@ check_command() {
 
 # Check if the script is run as root
 check_root() {
-    if [ "$(id -u)" -ne 0 ]; then
+    if [ "$(id -u)" -ne 0; then
         echo "Error: Run this script as root." | tee -a "$LOG_FILE" "$RESULTS_FILE"
         exit 1
     fi
@@ -106,6 +106,13 @@ display_usage() {
     echo "  -i  Enable interactive mode" | tee -a "$LOG_FILE" "$RESULTS_FILE"
 }
 
+# Restart network services
+restart_network_services() {
+    section_header "Restarting Network Services"
+    run_and_log "service netif restart"
+    run_and_log "service routing restart"
+}
+
 # Interactive mode menu
 interactive_menu() {
     echo -e "\n"
@@ -120,9 +127,10 @@ interactive_menu() {
     echo "8) USB Devices Configuration"
     echo "9) PCI Devices Configuration"
     echo "10) System Information"
-    echo "11) All of the above"
-    echo "12) Exit"
-    echo -n "Enter your choice [1-12]: "
+    echo "11) Restart Network Services"
+    echo "12) All of the above"
+    echo "13) Exit"
+    echo -n "Enter your choice [1-13]: "
     read -r choice
     return $choice
 }
@@ -173,6 +181,7 @@ run_all_diagnostics() {
     usb_devices_configuration
     pci_devices_configuration
     system_information
+    restart_network_services
 }
 
 # Functions for diagnostics
@@ -274,13 +283,16 @@ if [ "$INTERACTIVE" -eq 1 ]; then
                 system_information
                 ;;
             11)
-                run_all_diagnostics
+                restart_network_services
                 ;;
             12)
+                run_all_diagnostics
+                ;;
+            13)
                 exit 0
                 ;;
             *)
-                echo "Invalid choice. Please enter a number between 1 and 12."
+                echo "Invalid choice. Please enter a number between 1 and 13."
                 ;;
         esac
     done
@@ -292,4 +304,6 @@ fi
 # Additional help
 section_header "Additional Help"
 cat <<EOF | tee -a "$LOG_FILE" "$RESULTS_FILE"
-For more help, visit the GhostBSD Telegram group: https://
+For more help, visit the GhostBSD Telegram group: https://t.me/GhostBSD or IRC chat group.
+Post a copy of these outputs to pastebin.com and share the URL link for review.
+EOF
