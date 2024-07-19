@@ -41,6 +41,8 @@ backup_file() {
     if [ -f "$file" ]; then
         cp "$file" "$backup"
         echo "Backup of $file created at $backup" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    else
+        echo "Warning: File ${file} does not exist. Skipping backup." | tee -a "$LOG_FILE" "$RESULTS_FILE"
     fi
 }
 
@@ -55,7 +57,7 @@ output_file_contents() {
         echo -e "\nContents of ${file}:\n" | tee -a "$LOG_FILE" "$RESULTS_FILE"
         cat "$file" | tee -a "$LOG_FILE" "$RESULTS_FILE"
     else
-        echo -e "\nError: File ${file} does not exist.\n" | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Error: File ${file} does not exist." | tee -a "$LOG_FILE" "$RESULTS_FILE"
     fi
 }
 
@@ -115,7 +117,8 @@ restart_network_services() {
     if [ -n "$INTERFACE" ]; then
         run_and_log "dhclient $INTERFACE"
     else
-        echo "No suitable network interface found to run dhclient." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Error: No suitable network interface found to run dhclient." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Suggestion: Ensure your network interface is properly recognized and configured." | tee -a "$LOG_FILE" "$RESULTS_FILE"
     fi
 }
 
@@ -198,8 +201,13 @@ list_network_interfaces() {
 
 check_wifi_status() {
     section_header "Wi-Fi Connection Status"
-    run_and_log "ifconfig wlan0"
-    run_and_log "wpa_cli status"
+    if ifconfig wlan0 >/dev/null 2>&1; then
+        run_and_log "ifconfig wlan0"
+        run_and_log "wpa_cli status"
+    else
+        echo "Error: wlan0 interface not found." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Suggestion: Ensure your wireless interface is correctly configured and wlan0 exists." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+    fi
 }
 
 ping_tests() {
@@ -221,7 +229,8 @@ gateway_reachability_test() {
     if [ -n "$GATEWAY" ]; then
         run_and_log "ping -c 3 $GATEWAY"
     else
-        echo "No default gateway found." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Error: No default gateway found." | tee -a "$LOG_FILE" "$RESULTS_FILE"
+        echo "Suggestion: Check your network configuration and ensure a default gateway is set." | tee -a "$LOG_FILE" "$RESULTS_FILE"
     fi
 }
 
