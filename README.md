@@ -11,12 +11,12 @@
 ### Basic Usage
 
 Set execute privilege for the script:
-```sh
+```
 chmod +x wifi-diagnostics.sh
 ```
 
 Run the script:
-```sh
+```
 ./wifi-diagnostics.sh
 ```
 
@@ -28,7 +28,7 @@ Run the script:
 ### Example
 
 Run the script in interactive mode:
-```sh
+```
 sudo ./wifi-diagnostics.sh -i
 ```
 
@@ -46,8 +46,9 @@ The script provides the following diagnostics:
 8. **USB Devices Configuration**: Lists USB device configurations using `usbconfig`.
 9. **PCI Devices Configuration**: Lists PCI device configurations using `pciconf`.
 10. **System Information**: Collects basic system information using `uname`.
-11. **All of the above**: Run all diagnostics.
-12. **Exit**: Exit the script.
+11. **Restart Network Services**: Restarts network services if issues are detected.
+12. **All of the above**: Run all diagnostics.
+13. **Exit**: Exit the script.
 
 ### Interactive Mode
 
@@ -65,9 +66,10 @@ Select diagnostics to run:
 8) USB Devices Configuration
 9) PCI Devices Configuration
 10) System Information
-11) All of the above
-12) Exit
-Enter your choice [1-12]: 
+11) Restart Network Services
+12) All of the above
+13) Exit
+Enter your choice [1-13]: 
 ```
 
 ## Output
