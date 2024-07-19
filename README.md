@@ -4,30 +4,33 @@
 
 ## Overview
 
-`wifi-diagnostics.sh` is a shell script designed to help diagnose and gather information about networking hardware and configurations on GhostBSD systems. It collects various details about the system, including PCI and USB device configurations, kernel modules, and network configuration files, to assist in troubleshooting network issues.
+`wifi-diagnostics.sh` is a shell script designed to help diagnose and gather information about networking hardware and configurations on GhostBSD systems. It collects various details about the system, including PCI and USB device configurations, kernel modules, and network configuration files. This helps troubleshoot network issues.
 
 ## Usage
 
 ### Basic Usage
 
-Set execute privilege for the script:
+To set execute privilege for the script:
+
 ```
 chmod +x wifi-diagnostics.sh
 ```
 
-Run the script:
+To run the script:
+
 ```
 ./wifi-diagnostics.sh
 ```
 
 ### Options
 
-- `-v` : Enable verbose mode. This will provide more detailed output.
-- `-i` : Enable interactive mode. This allows you to select which diagnostics to run.
+- `-v` : Enable verbose mode for more detailed output.
+- `-i` : Enable interactive mode to select which diagnostics to run.
 
 ### Example
 
-Run the script in interactive mode:
+To run the script in interactive mode:
+
 ```
 sudo ./wifi-diagnostics.sh -i
 ```
@@ -46,10 +49,10 @@ The script provides the following diagnostics:
 8. **USB Devices Configuration**: Lists USB device configurations using `usbconfig`.
 9. **PCI Devices Configuration**: Lists PCI device configurations using `pciconf`.
 10. **System Information**: Collects basic system information using `uname`.
-11. **Configure Network Interface**: Configures the network interface with the provided SSID and password based on the device type (e.g., rtwn0, iwn0, ath0).
+11. **Configure Network Interface**: Configures the network interface with the provided SSID and password based on the device type.
 12. **Restart Network Services**: Restarts network services if issues are detected.
-13. **All of the above**: Run all diagnostics.
-14. **Exit**: Exit the script.
+13. **All of the above**: Runs all diagnostics.
+14. **Exit**: Exits the script.
 
 ### Interactive Mode
 
@@ -74,9 +77,28 @@ Select diagnostics to run:
 Enter your choice [1-14]: 
 ```
 
+## Network Interface Configuration
+
+The script supports configuring a wide range of WiFi network interfaces and their associated drivers:
+
+- **rtwn0**
+- **rsu0**
+- **iwn0**
+- **iwm0**
+- **ath0**
+- **ral0**
+- **run0**
+- **bwn0**
+- **bwi0**
+- **urtwn0**
+- **zyd0**
+
+During configuration, the script will add the appropriate driver entries to `/boot/loader.conf`.
+
 ## Output
 
 The script logs all outputs to the following files:
+
 - `wifi_diagnostic_results.log`: Detailed log file containing all command outputs.
 - `wifi_diagnostic_results.txt`: Summary file containing key information.
 
